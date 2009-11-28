@@ -160,9 +160,9 @@ function Node(name) {
 	this.name = name;
 	var size = Math.min(width, height);	
 	this.position = new Vector(
-		p.random(size) - (size / 2), 
-		p.random(size) - (size / 2), 
-		p.random(size) - (size / 2));
+		(Math.random() * size) - (size / 2), 
+		(Math.random() * size) - (size / 2), 
+		(Math.random() * size) - (size / 2));
 	this.position.scale(0.5);
 }
 
@@ -177,12 +177,15 @@ Node.prototype.project = function(m) {
 };
 
 Node.prototype.draw = function() {
-	var s = 5000 / -this.projection.z;
-	p.fill(p.color(164 + this.alpha  * 0.25));
-	p.ellipse(this.projection.x, this.projection.y, s, s);
-	context.font = s / 2 + "pt sans-serif";
-	p.fill(p.color(164, 192 + this.alpha  * 0.25, 164));
-	context.fillText(this.name, this.projection.x + s, this.projection.y + s / 2);
+	var scale = 5000 / -this.projection.z;
+	var color = (164 + this.alpha  * 0.25);
+	context.fillStyle = 'rgb(' + color + ',' + color + ',' + color + ')';
+	context.arc(this.projection.x, this.projection.y, scale, 0, Math.PI * 2, false);
+	context.fill();
+	context.font = scale / 2 + "pt sans-serif";
+	var textColor = (192 + this.alpha * 0.25);
+	context.fillStyle = 'rgb(164,' + textColor + ',164)';
+	context.fillText(this.name, this.projection.x + scale, this.projection.y + scale / 2);
 };
 
 Node.prototype.update = function() {
@@ -192,31 +195,38 @@ Node.prototype.update = function() {
 // Class NorbertNode 
 jQuery.extend(NorbertNode.prototype, Node.prototype);
 function NorbertNode() {
-	this.norbert = p.loadImage("norbert.png");
+	this.norbert = new Image();
+	this.norbert.src = "norbert.png";
 	this.position = new Vector(0, 0, 0);
 }
 
 NorbertNode.prototype.draw = function() {
-	var s = this.projection.z / (width / 2);
-	s *= 3;
-	var x = this.projection.x - (186 / s);
-	var y = this.projection.y - (150 / s);
-	p.image(this.norbert, x, y, 372 / s, 300 / s);
+	var s = Math.abs(this.projection.z / (width / 2));
+	s *= 2;
+	var x = Math.floor(this.projection.x - (186 / s));
+	var y = Math.floor(this.projection.y - (50 / s));
+	context.drawImage(this.norbert, x, y);
 };	
 
+// Class Pamela
 
-var p;
+Pamela.prototype.millis = function() { 
+	return (new Date).getTime(); 
+};
+
+var ooo = 2;
 
 $(document).ready(function() {
-	goPamela();
+	new Pamela();
 });
 
-function goPamela() {
+
+function Pamela() {
 	
-	p = Processing("pamela");
+	var p = Processing("pamela");
 	context = p.context;
-	width = p.width;
-	height = p.height;
+	width = context.canvas.clientWidth;
+	height = context.canvas.clientHeight;
 
 	var entities = ["sandb", "fs111", "tazo", "wouter", "unknown", "unknown", "unknown", "unknown"];
 	var m = new Matrix();
@@ -226,7 +236,7 @@ function goPamela() {
 	p.startTime = p.millis();
 	
 	p.setup = function() {
-		p.noStroke();
+		//p.noStroke();
 		var count = 0;
 		this.nodes = [];
 		this.nodes[count++] = new NorbertNode();
@@ -236,7 +246,7 @@ function goPamela() {
 	};
 	
 	p.animate = function(secs) {
-		return -0.5 + (p.millis() % secs) / secs;
+		return -0.5 + (this.millis() % secs) / secs;
 	};
 	
 	p.mousePressed = function() {
@@ -249,7 +259,6 @@ function goPamela() {
 			return;
 			
 		m.resetMatrix();
-		//m.rotateZ(this.animate(8000) * 2 * Math.PI);
 		var startAnimation = 1 - ((p.millis() - p.startTime) / 3000);
 		if (startAnimation > 0) { 
 			startAnimation *= startAnimation;
@@ -257,10 +266,7 @@ function goPamela() {
 			m.translate(0, 0, Math.PI * startAnimation);
 		}
 		
-		//m.translate(0, 0, -width / 4 + Math.abs(this.animate(21000) * (-width / 4)));
 		m.translate(0, 0, -width / 6);
-		//if (startAnimation > 0) 
-		//m.rotateX(2 * Math.PI * startAnimation);
 		m.rotateY(this.animate(7000) * 2 * Math.PI);
 		
 		for (var i = 0; i < this.nodes.length; i++) {
@@ -271,14 +277,20 @@ function goPamela() {
 			return a.projection.z - b.projection.z;
 		});		
 
-		p.background(255);
-		p.pushMatrix();
-		p.translate(width / 2, height / 2);
+		context.clearRect(0,0,width,height);
+		context.save();
+		context.translate(width / 2, height / 2);
 		for (var i = 0; i < this.nodes.length; i++) {
 			this.nodes[i].draw();
 		}
-		p.popMatrix();
+		context.restore();
 	};
 	
 	p.init();
+}
+
+function loadImage(name) {
+	var img = new Image();     
+	img.src = name;
+	return img;
 }
