@@ -1,4 +1,6 @@
 var context;
+var width;
+var height;
 
 // Class Vector 
 function Vector(x, y, z) {
@@ -34,15 +36,15 @@ Vector.prototype.rotateX = function(a) {
 };
 
 Vector.prototype.rotateY = function(a) {
-	var c = p.cos(a);
-	var s = p.sin(a);
+	var c = Math.cos(a);
+	var s = Math.sin(a);
 	this.x = this.x * c + this.z * s;
 	this.z = this.z * c - this.x * s;
 };
 
 Vector.prototype.rotateZ = function(a) {
-	var c = p.cos(a);
-	var s = p.sin(a);
+	var c = Math.cos(a);
+	var s = Math.sin(a);
 	this.x = this.x * c + this.y * s;
 	this.y = this.y * c - this.x * s;
 };
@@ -65,7 +67,7 @@ Vector.prototype.project = function(cam) {
 	var d = this.clone();
 	d.subtract(cam);
 	if (d.z < 0) return false;
-	var s = (p.width / 2) / d.distance();
+	var s = (width / 2) / d.distance();
 	return { x: d.x * s, y: d.y * s, scale: s };
 };
 
@@ -134,8 +136,8 @@ Matrix.prototype.translate = function(dX, dY, dZ) {
 
 Matrix.prototype.project = function(v) {
 	var pj = this.multiplyVector(v);
-	pj.x /= pj.z / (p.width / 2);
-	pj.y /= pj.z / (p.width / 2);
+	pj.x /= pj.z / (width / 2);
+	pj.y /= pj.z / (width / 2);
 	return pj;
 };
 
@@ -156,7 +158,7 @@ Matrix.prototype._mult = function(m) {
 // Class Node 
 function Node(name) {
 	this.name = name;
-	var size = Math.min(p.width, p.height);	
+	var size = Math.min(width, height);	
 	this.position = new Vector(
 		p.random(size) - (size / 2), 
 		p.random(size) - (size / 2), 
@@ -178,9 +180,9 @@ Node.prototype.draw = function() {
 	var s = 5000 / -this.projection.z;
 	p.fill(p.color(164 + this.alpha  * 0.25));
 	p.ellipse(this.projection.x, this.projection.y, s, s);
-	p.context.font = s / 2 + "pt sans-serif";
+	context.font = s / 2 + "pt sans-serif";
 	p.fill(p.color(164, 192 + this.alpha  * 0.25, 164));
-	p.context.fillText(this.name, this.projection.x + s, this.projection.y + s / 2);
+	context.fillText(this.name, this.projection.x + s, this.projection.y + s / 2);
 };
 
 Node.prototype.update = function() {
@@ -195,7 +197,7 @@ function NorbertNode() {
 }
 
 NorbertNode.prototype.draw = function() {
-	var s = this.projection.z / (p.width / 2);
+	var s = this.projection.z / (width / 2);
 	s *= 3;
 	var x = this.projection.x - (186 / s);
 	var y = this.projection.y - (150 / s);
@@ -213,6 +215,8 @@ function goPamela() {
 	
 	p = Processing("pamela");
 	context = p.context;
+	width = p.width;
+	height = p.height;
 
 	var entities = ["sandb", "fs111", "tazo", "wouter", "unknown", "unknown", "unknown", "unknown"];
 	var m = new Matrix();
@@ -249,12 +253,12 @@ function goPamela() {
 		var startAnimation = 1 - ((p.millis() - p.startTime) / 3000);
 		if (startAnimation > 0) { 
 			startAnimation *= startAnimation;
-			m.translate((p.width / 4) * startAnimation, 0 ,0);
+			m.translate((width / 4) * startAnimation, 0 ,0);
 			m.translate(0, 0, Math.PI * startAnimation);
 		}
 		
-		//m.translate(0, 0, -p.width / 4 + Math.abs(this.animate(21000) * (-p.width / 4)));
-		m.translate(0, 0, -p.width / 6);
+		//m.translate(0, 0, -width / 4 + Math.abs(this.animate(21000) * (-width / 4)));
+		m.translate(0, 0, -width / 6);
 		//if (startAnimation > 0) 
 		//m.rotateX(2 * Math.PI * startAnimation);
 		m.rotateY(this.animate(7000) * 2 * Math.PI);
@@ -269,7 +273,7 @@ function goPamela() {
 
 		p.background(255);
 		p.pushMatrix();
-		p.translate(p.width / 2, p.height / 2);
+		p.translate(width / 2, height / 2);
 		for (var i = 0; i < this.nodes.length; i++) {
 			this.nodes[i].draw();
 		}
