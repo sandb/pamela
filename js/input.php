@@ -1,4 +1,25 @@
-<?php  header("Content-type: application/pdf");  header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");  header("Cache-Control: no-cache");  header("Pragma: no-cache");  ?>  [ "00:01:e8:04:99:be", 
+<?php  
+/*
+    Copyright 2009 Pieter Iserbyt
+
+    This file is part of Pamela.
+
+    Pamela is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Pamela is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Pamela.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+header("Content-type: application/pdf");  header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");  header("Cache-Control: no-cache");  header("Pragma: no-cache");  ?>  [ "00:01:e8:04:99:be", 
 "00:05:4e:40:1e:97", 
 "00:0c:f1:16:10:ba", 
 "00:0c:f1:1d:dc:70", 
