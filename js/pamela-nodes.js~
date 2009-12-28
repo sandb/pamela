@@ -62,7 +62,7 @@ Node.prototype.normal = {
 			Math.round(128 * invAlphaScale + this.color[2] * alphaScale),
 		];
 		context.fillStyle = 'rgb(' + col[0] + ',' + col[1] + ',' + col[2] + ')';
-		context.globalAlpha = this.alpha / 255; 
+		context.globalAlpha = 128 + this.alpha / 512; 
 		context.beginPath();
 		context.arc(this.projection.x, this.projection.y, scale, 0, Math.PI * 2, false);
 		context.fill();
