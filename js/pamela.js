@@ -36,8 +36,8 @@ function Pamela(canvas) {
 	};
 	
 	this.buttons = new IFaceButtons();
-	this.fullScreenButton = new FullScreenButton(); 
-	this.buttons.add(this.fullScreenButton);
+	this.downloadScriptButton = new DownloadScriptButton(); 
+	this.buttons.add(this.downloadScriptButton);
 	this.resize();
 
 	this.m = new Matrix();
@@ -114,20 +114,13 @@ Pamela.prototype.start = function() {
 };
 
 Pamela.prototype.mousemove = function(event) {
-	this.fullScreenButton.isHover = this.fullScreenButton.isHovered(event.offsetX, event.offsetY);
+	this.buttons.mousemove(event);
 	this.mouse.x = event.offsetX;
 	this.mouse.y = event.offsetY;
 };
 
 Pamela.prototype.mouseclick = function(event) {
-	if (this.fullScreenButton.isHovered(event.offsetX, event.offsetY))
-		this.fullScreenButton.execute();
-};
-
-Pamela.prototype.mousein = function(event) {
-};
-
-Pamela.prototype.mouseout = function(event) {
+	this.buttons.mouseclick(event);
 };
 
 Pamela.prototype.fire = function() {
@@ -199,7 +192,7 @@ Pamela.prototype.resize = function() {
 
 Pamela.prototype.updateEntries = function() {
 	var self = this;
-	$.getJSON("js/input.php", function(data) { 
+	$.getJSON("macs.php", function(data) { 
 		self.updateNodes(data);	
 	});
 	self.entriesTimer = setTimeout(function() { self.updateEntries(); }, 60000);

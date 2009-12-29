@@ -19,8 +19,8 @@
 */
 
 header("Content-type: text/plain");  
-require_once("../config.php");
-require_once("util.php");
+require_once("config.php");
+require_once("lib/util.php");
 
 function echoln($str) {
 	echo("$str\n");

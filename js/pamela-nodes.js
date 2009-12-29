@@ -156,7 +156,7 @@ NorbertNode.prototype.draw = function() {
 	s *= 2;
 	//var x = Math.floor(this.projection.x - (186 / s));
 	//var y = Math.floor(this.projection.y - (50 / s));
-	var x = Math.floor(this.projection.x - (250 / s));
+	var x = Math.floor(this.projection.x - (192 / s));
 	var y = Math.floor(this.projection.y - (180 / s));
 	context.drawImage(this.norbert, x, y);
 };

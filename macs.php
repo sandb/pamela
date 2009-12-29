@@ -38,13 +38,13 @@ class Macs {
 	
 	private function readFile($filename) {
 		$mcs = file_get_contents($filename);
-		$this->macs = array_merge($this->macs, explode('|', $mcs));
+		$this->macs = array_merge($this->macs, explode(',', $mcs));
 	}
 	
 	private function readFiles($directory) {
 		$macFiles = scandir($directory);
 		foreach ($macFiles as $macFile) {
-			if (preg_match("/\.macs$/", $macFile) != 1)
+			if (preg_match("/.+\.macs$/", $macFile) != 1)
 				continue;
 			
 			$filename = "$directory/$macFile";
@@ -64,6 +64,11 @@ class Macs {
 	}
 	
 	private function createJson() {
+		if (count($this->macs) < 1) {
+			echo '[]';
+			return;
+		}
+		
 		echo '["';
 		echo implode('", "', $this->macs);
 		echo '"]';

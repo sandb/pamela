@@ -80,6 +80,37 @@ FullScreenButton.prototype.execute = function() {
 	//TODO: do somth 
 };
 
+// Class DownloadScriptButton
+
+jQuery.extend(DownloadScriptButton.prototype, IFaceButton.prototype);
+function DownloadScriptButton(x, y) {
+
+	this.width = 64;
+	this.height = 64;
+	
+	this.isHover = false;
+	
+	this.dlCol = new Image();
+	this.dlCol.src = "img/dl-col.png";
+	this.dl = new Image();
+	this.dl.src = "img/dl.png";
+};
+
+DownloadScriptButton.prototype.draw = function() {
+	if (this.isHover) {
+		context.fillStyle = 'rgb(192,192,192)';
+		context.font = "18pt sans-serif";
+		context.fillText("Download pamela scanner script", this.x, this.y - 10);
+		context.drawImage(this.dlCol, this.x, this.y);
+	} else {
+		context.drawImage(this.dl, this.x, this.y);
+	}		
+};
+
+DownloadScriptButton.prototype.execute = function() {
+	location.href = 'pamela-scanner.sh';
+};
+
 // Class IFace buttons
 function IFaceButtons() {
 	this.buttons = [];
@@ -91,11 +122,11 @@ IFaceButtons.prototype.add = function(button) {
 };
 
 IFaceButtons.prototype.reposition = function() {
-	var x = width - 64;
+	var x = 20;
 	var y = height - 64;
 	for (var i = 0; i < this.buttons.length; i++) { 
 		this.buttons[i].moveTo(x, y);
-		x -= 64;
+		x += 64;
 	}
 };
 
@@ -104,3 +135,17 @@ IFaceButtons.prototype.draw = function() {
 		this.buttons[i].draw();
 };
 
+IFaceButtons.prototype.mousemove = function(event) {
+	for (var i =0; i < this.buttons.length; i++) {
+		var b = this.buttons[i];
+		b.isHover = b.isHovered(event.offsetX, event.offsetY);
+	}
+};
+
+IFaceButtons.prototype.mouseclick = function(event) {
+	for (var i =0; i < this.buttons.length; i++) {
+		var b = this.buttons[i];
+		if (b.isHovered(event.offsetX, event.offsetY))
+			b.execute();
+	}
+};
