@@ -32,8 +32,8 @@ class Upload {
 	private $macs;
 
 	function __construct() {
-		$this->subnet = intvaldef(getQuery("sn"), NULL);
-		$this->macs = getQuery("macs");
+		$this->subnet = getPost("sn");
+		$this->macs = getPost("macs");
 	}
 
 	private function parseAndValidate() {
@@ -45,11 +45,23 @@ class Upload {
 			echoln("Missing macs param");
 			return false;
 		}
-		if (($this->subnet < 0) || ($this->subnet > 4294967295)) {
+		
+		if (preg_match("/^(\d{1,3}\.){3}\d{1,3}$/", $this->subnet) != 1) {
 			echoln("subnet ($this->subnet) is not valid");
 			return false;
 		}
-		$mcs = explode('|', $this->macs);
+		
+		$snParts = explode('.', $this->subnet);
+		foreach($snParts as $part) {
+			$i = intvaldef($part, -1);
+			if (($i >= 0) && ($i <= 255)) 
+				continue;
+
+			echoln("subnet ($this->subnet) contains invalid parts ($part)");
+			return false;
+		}
+
+		$mcs = explode(',', $this->macs);
 		foreach($mcs as $mac) {
 			if (preg_match("/^(([\dABCDEF]){2}:){5}([\dABCDEF]){2}$/i", $mac) == 1)
 				continue;
