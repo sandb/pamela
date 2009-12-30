@@ -39,8 +39,8 @@ exit 1
 }
 
 IF='wlan0'
-OUT='http://localhost/sb/pamela/upload.php'
-SLEEP='60'
+OUT='http://81.163.130.39/pamela/upload.php'
+SLEEP='120'
 
 TEMP=$(getopt -o 'hi:o:s:-n' "pamela arp scanner" -- "$@")
 if [ $? != 0 ] ; then echo "Could not parse parameters..." >&2 ; exit 1 ; fi
