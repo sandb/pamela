@@ -115,8 +115,8 @@ Pamela.prototype.start = function() {
 
 Pamela.prototype.mousemove = function(event) {
 	this.buttons.mousemove(event);
-	this.mouse.x = event.offsetX;
-	this.mouse.y = event.offsetY;
+	this.mouse.x = event.clientX;
+	this.mouse.y = event.clientY;
 };
 
 Pamela.prototype.mouseclick = function(event) {
@@ -195,7 +195,7 @@ Pamela.prototype.updateEntries = function() {
 	$.getJSON("macs.php", function(data) { 
 		self.updateNodes(data);	
 	});
-	self.entriesTimer = setTimeout(function() { self.updateEntries(); }, 60000);
+	self.entriesTimer = setTimeout(function() { self.updateEntries(); }, 20000);
 };
 
 $(document).ready(function() {

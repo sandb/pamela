@@ -138,14 +138,14 @@ IFaceButtons.prototype.draw = function() {
 IFaceButtons.prototype.mousemove = function(event) {
 	for (var i =0; i < this.buttons.length; i++) {
 		var b = this.buttons[i];
-		b.isHover = b.isHovered(event.offsetX, event.offsetY);
+		b.isHover = b.isHovered(event.clientX, event.clientY);
 	}
 };
 
 IFaceButtons.prototype.mouseclick = function(event) {
 	for (var i =0; i < this.buttons.length; i++) {
 		var b = this.buttons[i];
-		if (b.isHovered(event.offsetX, event.offsetY))
+		if (b.isHovered(event.clientX, event.clientY))
 			b.execute();
 	}
 };
