@@ -126,7 +126,7 @@ Pamela.prototype.mouseclick = function(event) {
 Pamela.prototype.fire = function() {
 	if (!this.play) return;
 	var self = this;
-	this.timer = setTimeout(function() { self.draw(); }, 10);
+	this.timer = setTimeout(function() { self.draw(); }, 50);
 };
 
 Pamela.prototype.stop = function() {
