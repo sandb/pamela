@@ -39,7 +39,7 @@ exit 1
 }
 
 IF='wlan0'
-OUT='http://81.163.130.39/pamela/upload.php'
+OUT='http://hackerspace.be/pam/upload.php'
 SLEEP='120'
 
 TEMP=$(getopt -o 'hi:o:s:-n' "pamela arp scanner" -- "$@")

@@ -166,7 +166,7 @@ Pamela.prototype.draw = function() {
 	});		
 
 	context.save();
-	context.fillStyle = "#333";
+	context.fillStyle = "#fff";
 	context.fillRect( 0, 0, width, height );
 	context.translate(width / 2, height / 2);
 	for (var i = 0; i < this.nodes.length; i++) {
