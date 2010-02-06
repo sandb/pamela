@@ -148,6 +148,9 @@ jQuery.extend(NorbertNode.prototype, Node.prototype);
 function NorbertNode() {
 	this.norbert = new Image();
 	this.norbert.src = "img/norbert-8bit.png";
+	self = this;
+	this.norbertLoaded = false;
+	this.norbert.onload=function() { self.norbertLoaded = true; }
 	this.position = new Vector(0, 0, 0);
 }
 
@@ -158,6 +161,7 @@ NorbertNode.prototype.draw = function() {
 	var y = Math.floor(this.projection.y - (50 / s));
 	//var x = Math.floor(this.projection.x - (192 / s));
 	//var y = Math.floor(this.projection.y - (180 / s));
-	context.drawImage(this.norbert, x, y);
+	if (this.norbertLoaded)
+		context.drawImage(this.norbert, x, y);
 };
 
