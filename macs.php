@@ -25,8 +25,18 @@ header("Pragma: no-cache");
 
 require_once("config.php");
 require_once("lib/util.php");
+require_once("lib/trans.php");
 
 // [ "00:01:e8:04:99:be",  "00:05:4e:40:1e:97",  "00:0c:f1:16:10:ba", "00:0c:f1:1d:dc:70",  "00:0e:35:96:c7:ff",  "00:11:85:6a:1f:ec",  ] 
+
+
+function translator($mac) {
+	global $mac_translation_table;
+	if (array_key_exists($mac, $mac_translation_table))
+		return $mac_translation_table[$mac];
+	return $mac;
+}
+
 
 class Macs {
 
@@ -62,6 +72,10 @@ class Macs {
 	private function cleanUp() {
 		$this->macs = array_unique($this->macs);
 	}
+
+	private function translate() {
+		$this->macs = array_map("translator", $this->macs);
+	}
 	
 	private function createJson() {
 		if (count($this->macs) < 1) {
@@ -77,6 +91,7 @@ class Macs {
 	public function run() {
 		$this->readFiles(OUTPUT_SERVER_DIRECTORY);
 		$this->cleanUp();
+		$this->translate();
 		$this->createJson();
 	}
 	 
