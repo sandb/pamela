@@ -17,6 +17,33 @@
     along with Pamela.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
+// Class color generator 
+
+function ColorGenerator() {
+	this.colors = [
+		[255,   0,   0],
+		[255, 255,   0],
+		[  0, 255,   0],
+		[  0, 255, 255],
+		[  0,   0, 255],
+		[255,   0, 255]
+	]; 
+	this.colorGeneratorValue = 0;
+}
+
+ColorGenerator.prototype.generate = function() {
+	if (this.colorGeneratorValue > this.colors.length)
+		this.colorGeneratorValue = 0;
+
+	// weirdo fix for chrome bug where the colors get
+	// garbage collected. I think.
+	var c = this.colors[this.colorGeneratorValue++];
+	return [c[0], c[1], c[2]];
+};
+
+var colorGenerator = new ColorGenerator();
+
 // Class Node 
 function Node(name) {
 
@@ -25,10 +52,11 @@ function Node(name) {
 	this.setMode("newNode");
 	
 	var size = Math.min(width, height);
-	this.color = [
-		Math.random() * 128, 
-		Math.random() * 128, 
-		Math.random() * 128];	
+	//this.color = [
+	//	Math.random() * 128, 
+	//	Math.random() * 128, 
+	//	Math.random() * 128];	
+	this.color = colorGenerator.generate();
 	this.position = new Vector(
 		(Math.random() * size) - (size / 2), 
 		(Math.random() * size) - (size / 2), 
@@ -67,7 +95,7 @@ Node.prototype.normal = {
 	draw: function() {
 		if (this.projection.z > -1) return;
 		var scale = width * 3 / -this.projection.z;
-		var alphaScale = this.alpha / 255;
+		var alphaScale = 0.5 + this.alpha / 128;
 		var invAlphaScale = 1 - alphaScale;
 		var col = 
 		/* [
@@ -79,7 +107,7 @@ Node.prototype.normal = {
 			Math.round(128 * invAlphaScale + this.color[0] * alphaScale),
 			Math.round(128 * invAlphaScale + this.color[1] * alphaScale),
 			Math.round(128 * invAlphaScale + this.color[2] * alphaScale),
-		];
+		]; 
 		context.fillStyle = 'rgb(' + col[0] + ',' + col[1] + ',' + col[2] + ')';
 		//context.globalAlpha = this.alpha / 255; 
 		context.beginPath();
