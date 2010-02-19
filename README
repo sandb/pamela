@@ -6,3 +6,12 @@
 | |_) | | | (_) | |  __/ (__| |_  | |_) | (_| | | | | | |  __/ | (_| |
 | .__/|_|  \___// |\___|\___|\__| | .__/ \__,_|_| |_| |_|\___|_|\__,_|
 |_|           |__/                |_|                                 
+
+
+Imagine some very elaborate description on what this is, but I fail in finding
+the right words right now. It is a very cool way to visualize people being
+present in the same physical location. It scans the local network for mac
+addresses and displays them in a very nice 3d HTML 5 canvas thing. Enough with
+the words, look at the installation in hsbxl. 
+
+http://hackerspace.be/pam/
