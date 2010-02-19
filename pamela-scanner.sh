@@ -30,10 +30,12 @@ echo 'Usage: pamela-scanner [OPTIONS]
   -s TIME       The time to sleep between scans in seconds. 
   -h            Shows help
   
-Pamela is an arp-scanner, it uploads the mac addresses in your local lan on a webserver
-where you get a visual representation of the mac addresses present. Multiple people
-on multiple lans can run pamela together against the same server, where all results
-are agregated. In short, pamela gives you an overview of how big the shared network is.' 
+Pamela is an arp-scanner, it uploads the mac addresses in your local lan on a
+webserver where you get a visual representation of the mac addresses present.
+Multiple people on multiple lans can run pamela together against the same
+server, where all results are agregated. In short, pamela gives you an overview
+of how big the shared network is.' 
+
 exit 1
 
 }
@@ -66,7 +68,7 @@ fi
 
 if [ -z "$(which arp-scan)" ]
 then
-	echo "Could not find arp-scan, which is required for pamela to scan the mac addresses"
+	echo "ENOARPSCAN: Could not find arp-scan, please install it"
 fi
 
 while true
