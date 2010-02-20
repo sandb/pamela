@@ -21,30 +21,56 @@
 
 LICENSE
 
+PAM_DIR="$(cd $(dirname $0) && pwd)"
+PAM_CRON="/etc/cron.d/pamela"
+PAM_SCRIPT="$PAM_DIR/$(basename $0)"
+PAM_LOG="$PAM_DIR/pamela.log"
+
+REGISTER=
+
+IF='eth0'
+OUT='http://yourserver.com/pamela/upload.php'
+SLEEP='120'
+USER=''
+PASSWORD=''
+
 function usage {
 
-echo 'Usage: pamela-scanner [OPTIONS] 
+echo "Usage: pamela-scanner [OPTIONS] 
 
-  -i INTERFACE  Interface to arp-scan 
-  -o URL        The url of the pamela upload script (including /upload.php) 
-  -s TIME       The time to sleep between scans in seconds. 
+  -i INTERFACE  Interface to arp-scan. Defaults to [$IF]. 
+  -o URL        The url of the pamela upload script (including /upload.php). 
+		Defaults to [$OUT].
+  -s TIME       The time to sleep between scans in seconds. Defaults to [$SLEEP].
+  -r		Register the script in cron every 2 minutes
+  -q		Unregister the script from cron
+  -u		Http-auth user. Defaults to [$USER].
+  -p		Http-auth password. Defaults to [$PASSWORD].
   -h            Shows help
   
 Pamela is an arp-scanner, it uploads the mac addresses in your local lan on a
 webserver where you get a visual representation of the mac addresses present.
 Multiple people on multiple lans can run pamela together against the same
 server, where all results are agregated. In short, pamela gives you an overview
-of how big the shared network is.' 
+of how big the shared network is." 
 
 exit 1
 
 }
 
-IF='wlan0'
-OUT='http://hackerspace.be/pam/upload.php'
-SLEEP='120'
+function register {
+	echo "Registering pamela in cron: $PAM_CRON"
+	echo "*/2 *     * * *     root   [ -x \"$PAM_SCRIPT\" ] && \"$PAM_SCRIPT\" -i \"$IF\" -o \"$OUT\" -s \"$SLEEP\" -u \"$USER\" -p \"$PASSWORD\" >> \"$PAM_LOG\"" > "$PAM_CRON"
+	exit 0
+}
 
-TEMP=$(getopt -o 'hi:o:s:-n' "pamela arp scanner" -- "$@")
+function unregister {
+	echo "Unregistering pamela in cron: $PAM_CRON"
+	rm "$PAM_CRON"
+	exit 0
+}
+
+TEMP=$(getopt -o 'hrqi:o:s:u:p:-n' "pamela arp scanner" -- "$@")
 if [ $? != 0 ] ; then echo "Could not parse parameters..." >&2 ; exit 1 ; fi
 eval set "$TEMP"
 while true
@@ -55,10 +81,17 @@ do
 		-i) IF="$2"; shift;;
 		-o) OUT="$2"; shift;;
 		-s) SLEEP="$2"; shift;;
+		-u) USER="$2"; shift;; 
+		-p) PASSWORD="$2"; shift;;
+		-r) REGISTER='r';;
+		-q) unregister; break;;
 		-h|'-?') usage; break;;
 		*) echo "Unknown param: [$1]"; usage; exit 1;
 	esac
 done
+
+#register only after parsing all args 
+[ -n "$REGISTER" ] && register
 
 if [ "$(id -ru)" != "0" ]
 then
@@ -83,7 +116,7 @@ do
 		let "NUM_MACS=NUM_MACS+1"
 	done
 	POST="sn=$NETMASK&macs=$MACS"
-	RESULT=$(wget "$OUT" -O - --quiet --post-data "$POST" || echo "wget error: $?")
+	RESULT=$(wget "$OUT" -O - --quiet --post-data "$POST" --user "$USER" --password "$PASSWORD" || echo "wget error: $?")
 	if [ -n "$RESULT" ]
 	then
 		echo Error uploading results:
