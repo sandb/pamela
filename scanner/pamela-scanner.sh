@@ -30,7 +30,6 @@ REGISTER=
 
 IF='eth0'
 OUT='http://yourserver.com/pamela/upload.php'
-SLEEP='120'
 USER=''
 PASSWORD=''
 
@@ -41,7 +40,6 @@ echo "Usage: pamela-scanner [OPTIONS]
   -i INTERFACE  Interface to arp-scan. Defaults to [$IF]. 
   -o URL        The url of the pamela upload script (including /upload.php). 
 		Defaults to [$OUT].
-  -s TIME       The time to sleep between scans in seconds. Defaults to [$SLEEP].
   -r		Register the script in cron every 2 minutes
   -q		Unregister the script from cron
   -u		Http-auth user. Defaults to [$USER].
@@ -60,7 +58,7 @@ exit 1
 
 function register {
 	echo "Registering pamela in cron: $PAM_CRON"
-	echo "*/2 *     * * *     root   [ -x \"$PAM_SCRIPT\" ] && \"$PAM_SCRIPT\" -i \"$IF\" -o \"$OUT\" -s \"$SLEEP\" -u \"$USER\" -p \"$PASSWORD\" >> \"$PAM_LOG\"" > "$PAM_CRON"
+	echo "*/2 *     * * *     root   [ -x \"$PAM_SCRIPT\" ] && \"$PAM_SCRIPT\" -i \"$IF\" -o \"$OUT\" -u \"$USER\" -p \"$PASSWORD\" >> \"$PAM_LOG\"" > "$PAM_CRON"
 	exit 0
 }
 
@@ -104,25 +102,20 @@ then
 	echo "ENOARPSCAN: Could not find arp-scan, please install it"
 fi
 
-while true
-do
-	echo $(date)" scanning..."
-	NETMASK="$(ip -4 addr show "$IF" | egrep -o "brd [0-9\.]+" | egrep -o "[0-9\.]+")"
-	MACS=""
-	NUM_MACS=0
-	for M in $(arp-scan -R -i 10 --interface "$IF" --localnet | awk '{ print $2 }' | grep :.*: | sort | uniq)
-	do 
-		[ -n "$MACS" ] && MACS="$MACS,$M" || MACS="$M";
-		let "NUM_MACS=NUM_MACS+1"
-	done
-	POST="sn=$NETMASK&macs=$MACS"
-	RESULT=$(wget "$OUT" -O - --quiet --post-data "$POST" --user "$USER" --password "$PASSWORD" || echo "wget error: $?")
-	if [ -n "$RESULT" ]
-	then
-		echo Error uploading results:
-		echo "$RESULT"
-	fi
-	echo $(date)" Uploaded $NUM_MACS mac addresses..."
-	echo $(date)" sleeping..."
-	sleep "$SLEEP"
+echo $(date)" scanning..."
+NETMASK="$(ip -4 addr show "$IF" | egrep -o "brd [0-9\.]+" | egrep -o "[0-9\.]+")"
+MACS=""
+NUM_MACS=0
+for M in $(arp-scan -R -i 10 --interface "$IF" --localnet | awk '{ print $2 }' | grep :.*: | sort | uniq)
+do 
+	[ -n "$MACS" ] && MACS="$MACS,$M" || MACS="$M";
+	let "NUM_MACS=NUM_MACS+1"
 done
+POST="sn=$NETMASK&macs=$MACS"
+RESULT=$(wget "$OUT" -O - --quiet --post-data "$POST" --user "$USER" --password "$PASSWORD" || echo "wget error: $?")
+if [ -n "$RESULT" ]
+then
+	echo Error uploading results:
+	echo "$RESULT"
+fi
+echo $(date)" Uploaded $NUM_MACS mac addresses..."
