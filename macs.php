@@ -24,11 +24,8 @@ header("Cache-Control: no-cache");
 header("Pragma: no-cache");   
 
 require_once("config.php");
-require_once("lib/util.php");
 require_once("lib/trans.php");
-
-// [ "00:01:e8:04:99:be",  "00:05:4e:40:1e:97",  "00:0c:f1:16:10:ba", "00:0c:f1:1d:dc:70",  "00:0e:35:96:c7:ff",  "00:11:85:6a:1f:ec",  ] 
-
+require_once("lib/macs.php");
 
 function translator($mac) {
 	global $mac_translation_table;
@@ -37,65 +34,7 @@ function translator($mac) {
 	return $mac;
 }
 
-
-class Macs {
-
-	private $macs;
-
-	function __construct() {
-		$this->macs = array();
-	}
-	
-	private function readFile($filename) {
-		$mcs = file_get_contents($filename);
-		$this->macs = array_merge($this->macs, explode(',', $mcs));
-	}
-	
-	private function readFiles($directory) {
-		$macFiles = scandir($directory);
-		foreach ($macFiles as $macFile) {
-			if (preg_match("/.+\.macs$/", $macFile) != 1)
-				continue;
-			
-			$filename = "$directory/$macFile";
-
-			// data is too old, remove			
-			if (filemtime($filename) + MACFILE_TTL < time()) {
-				unlink($filename);
-				continue;
-			}
-				
-			$this->readFile($filename);
-		}
-	}
-	
-	private function cleanUp() {
-		$this->macs = array_unique($this->macs);
-	}
-
-	private function translate() {
-		$this->macs = array_map("translator", $this->macs);
-	}
-	
-	private function createJson() {
-		if (count($this->macs) < 1) {
-			echo '[]';
-			return;
-		}
-		
-		echo '["';
-		echo implode('", "', $this->macs);
-		echo '"]';
-	}
-
-	public function run() {
-		$this->readFiles(OUTPUT_SERVER_DIRECTORY);
-		$this->cleanUp();
-		$this->translate();
-		$this->createJson();
-	}
-	 
-}
-
-$macs = new Macs();
-$macs->run();
+$macs = macs_get();
+$macs = array_map("translator", $macs);
+echo '["'.implode('", "', $macs).'"]';
+macs_purge();

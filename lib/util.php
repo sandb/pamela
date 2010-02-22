@@ -95,4 +95,8 @@ function script($source) {
   <script type="text/javascript" src="<?=$source?>"></script>
 <?php
 }
-?>
+
+function echoln($str) {
+	echo("$str\n");
+}
+

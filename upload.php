@@ -19,48 +19,23 @@
 */
 
 header("Content-type: text/plain");  
-require_once("config.php");
 require_once("lib/util.php");
-
-function echoln($str) {
-	echo("$str\n");
-}
+require_once("lib/macs.php");
 
 class Upload {
 
-	private $subnet;
 	private $macs;
 
 	function __construct() {
-		$this->subnet = getPost("sn");
 		$this->macs = getPost("macs");
 	}
 
 	private function parseAndValidate() {
-		if ($this->subnet == NULL) {
-			echoln("Missing or bad sn param");
-			return false;
-		}
 		if ($this->macs == NULL) {
 			echoln("Missing macs param");
 			return false;
 		}
 		
-		if (preg_match("/^(\d{1,3}\.){3}\d{1,3}$/", $this->subnet) != 1) {
-			echoln("subnet ($this->subnet) is not valid");
-			return false;
-		}
-		
-		$snParts = explode('.', $this->subnet);
-		foreach($snParts as $part) {
-			$i = intvaldef($part, -1);
-			if (($i >= 0) && ($i <= 255)) 
-				continue;
-
-			echoln("subnet ($this->subnet) contains invalid parts ($part)");
-			return false;
-		}
-
 		$mcs = explode(',', $this->macs);
 		foreach($mcs as $mac) {
 			if (preg_match("/^(([\dABCDEF]){2}:){5}([\dABCDEF]){2}$/i", $mac) == 1)
@@ -72,7 +47,10 @@ class Upload {
 	}
 
 	private function writeMacs() {
-		file_put_contents(OUTPUT_SERVER_DIRECTORY."/$this->subnet.macs", $this->macs);
+		$mcs = explode(',', $this->macs);
+		foreach($mcs as $mac) {
+			macs_add($mac);
+		}
 	}
 	
 	public function run() {
