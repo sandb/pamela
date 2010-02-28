@@ -16,8 +16,7 @@ function macs_get() {
 function macs_add($mac) {
 	$db = get_db();
 	$mac = sqlite_escape_string($mac);
-	$q = sqlite_exec($db, "insert into macs values (\"$mac\", strftime('%s','now'))");
-	if (!$q) return $results;
+	return sqlite_exec($db, "insert or replace into macs values (\"$mac\", strftime('%s','now'))");
 }
 
 function macs_purge() {
