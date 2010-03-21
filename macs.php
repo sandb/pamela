@@ -36,5 +36,9 @@ function translator($mac) {
 
 $macs = macs_get();
 $macs = array_map("translator", $macs);
-echo '["'.implode('", "', $macs).'"]';
+if (count($macs) > 0) {
+ echo '["'.implode('", "', $macs).'"]';
+} else {
+ echo '[]';
+} 
 macs_purge();
