@@ -151,8 +151,9 @@ Matrix.prototype.translate = function(dX, dY, dZ) {
 
 Matrix.prototype.project = function(v) {
 	var pj = this.multiplyVector(v);
-	pj.x /= pj.z / (width / 2);
-	pj.y /= pj.z / (width / 2);
+	var distancePerHalfScreen = (pj.z / pj.w) / (width / 2);
+	pj.x /= distancePerHalfScreen;
+	pj.y /= distancePerHalfScreen;
 	return pj;
 };
 

@@ -3,4 +3,3 @@ AddType application/vnd.ms-fontobject .eot
 
 RewriteRule (.*).php $1 
 RewriteRule (.*).hmtl $1
-

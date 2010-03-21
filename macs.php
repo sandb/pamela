@@ -27,9 +27,21 @@ require_once("config.php");
 require_once("lib/trans.php");
 require_once("lib/macs.php");
 
+// for debug purposes, increases the numbers of macs artificially
+function multiply() {
+ global $macs;
+ $c = count($macs);
+ for ($j = 0; $j < $c; $j++) {
+  for ($i = 0; $i <10; $i++) {
+    $macs[] = $macs[$j].$i;
+   }
+ }
+}
+
 $macs = macs_get();
 $macs = known_macs_translate($macs); 
 if (count($macs) > 0) {
+ //multiply();
  echo '["'.implode('", "', $macs).'"]';
 } else {
  echo '[]';
