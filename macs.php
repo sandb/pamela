@@ -27,15 +27,11 @@ require_once("config.php");
 require_once("lib/trans.php");
 require_once("lib/macs.php");
 
-//function translator($mac) {
-//	global $mac_translation_table;
-//	if (array_key_exists($mac, $mac_translation_table))
-//		return $mac_translation_table[$mac];
-//	return $mac;
-//}
-
 $macs = macs_get();
 $macs = known_macs_translate($macs); 
-//$macs = array_map("translator", $macs);
-echo '["'.implode('", "', $macs).'"]';
+if (count($macs) > 0) {
+ echo '["'.implode('", "', $macs).'"]';
+} else {
+ echo '[]';
+} 
 macs_purge();
