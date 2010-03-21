@@ -9,3 +9,4 @@ define("SQLITE_DB", "/home/sandbender/www/pamela/db/pamela.sql");
 
 // sql create statement for mac table
 define("CREATE_MAC_TABLE_SQL", "create table macs (mac text unique on conflict replace, committime integer);");
+define("CREATE_KNOWN_MAC_TABLE_SQL", "create table knownmacs (userid integer, mac text, name text, primary key (mac, userid));");
