@@ -37,7 +37,6 @@ function multiply() {
    }
  }
 }
-
 $macs = macs_get();
 $macs = known_macs_translate($macs); 
 if (count($macs) > 0) {

@@ -1,4 +1,6 @@
-<html xmlns="http://www.w3.org/1999/xhtml">
+<?php 
+require_once("config.php");
+?><html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title>Pamela</title>
     <script src="js/jquery-1.3.2.js" type="text/javascript"></script>

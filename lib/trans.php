@@ -4,10 +4,9 @@ require_once("lib/db.php");
 function known_macs_get() {
 	$results = array();
 	$db = get_db();
-	$q = sqlite_query($db, "select * from knownmacs");
+	$q = $db->query("select * from knownmacs");
 	if (!$q) return $results;
-	while(sqlite_has_more($q)) {
-		$row = sqlite_fetch_array($q, SQLITE_ASSOC);
+	while($row = $q->fetch_array(SQLITE_ASSOC)) {
 		$results[$row['mac']] = $row['name']; 
 	}
 	return $results;
@@ -16,10 +15,9 @@ function known_macs_get() {
 function known_macs_get_by_user($userid) {
 	$results = array();
 	$db = get_db();
-	$q = sqlite_query($db, "select * from knownmacs where userid = \"userid\"");
+	$q = $db->query("select * from knownmacs where userid = \"userid\"");
 	if (!$q) return $results;
-	while(sqlite_has_more($q)) {
-		$row = sqlite_fetch_array($q, SQLITE_ASSOC);
+	while($row = $q->fetch_array(SQLITE_ASSOC)) {
 		$results[$row['mac']] = $row['name']; 
 	}
 	return $results;
@@ -27,10 +25,10 @@ function known_macs_get_by_user($userid) {
 
 function known_macs_upsert($mac, $name, $show) {
 	$db = get_db();
-	$mac = sqlite_escape_string($mac);
-	$name = sqlite_escape_string($name);
-	$show = sqlite_escape_string($show);
-	return sqlite_exec($db, "insert into knownmacs or replace (mac, name, show) values (\"$mac\", \"$name\", \"$show\")");
+	$mac = $db->escape_string($mac);
+	$name = $db->escape_string($name);
+	$show = $db->escape_string($show);
+	return $db->exec("insert into knownmacs or replace (mac, name, show) values (\"$mac\", \"$name\", \"$show\")");
 }
 
 function known_macs_translate($macs) {
