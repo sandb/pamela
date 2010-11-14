@@ -108,7 +108,7 @@ DownloadScriptButton.prototype.draw = function() {
 };
 
 DownloadScriptButton.prototype.execute = function() {
-	location.href = 'pamela-scanner.sh';
+	location.href = config.scannerDownloadLink;
 };
 
 // Class IFace buttons

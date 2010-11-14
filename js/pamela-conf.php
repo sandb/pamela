@@ -7,4 +7,5 @@ config = new function() {
   this.image =  "<?php echo PAM_IMAGE; ?>";
   this.buttonColor = "<?php echo PAM_BUT_COLOR; ?>";
   this.buttonShow = <?php echo PAM_BUT_SHOW=="TRUE"?"true":"false"; ?>;
+  this.scannerDownloadLink = "<?php echo PAM_SCANNER_LINK; ?>";
 }
