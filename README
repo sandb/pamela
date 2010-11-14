@@ -1,4 +1,4 @@
-                      Hackerspace Brussels
+              Hackerspace Brussels/Whitespace Ghent
                             presents
                  _           _                                _       
  _ __  _ __ ___ (_) ___  ___| |_   _ __   __ _ _ __ ___   ___| | __ _ 
@@ -9,9 +9,38 @@
 
 
 Imagine some very elaborate description on what this is, but I fail in finding
-the right words right now. It is a very cool way to visualize people being
-present in the same physical location. It scans the local network for mac
+the right words right now. It is a very cool way to visualize any kind of data,
+for example people being present in the same physical location. 
+Currently it comes with an example scanner that scans the local network for mac
 addresses and displays them in a very nice 3d HTML 5 canvas thing. Enough with
-the words, look at the installation in hsbxl. 
+the words, look at the installation in hsbxl and whitespace: 
 
 http://hackerspace.be/pam/
+http://0x20.be/pam
+
+Installation
+============
+
+* Copy all the files in a directory that is hosted by a webserver, e.g. apache
+* Your webserver must naturally support php
+* The php-sqlite3 extension must be installed
+
+
+Configuration
+=============
+
+* Edit the config.php to configure Pamela
+* Make sure the configuration of where the database will be is a writable 
+  directory, a database will be created there automatically using the name you
+  specified.
+
+Scanner details
+===============
+
+You can upload data to the webinterface by posting a comma separted list to the
+upload.php page. This is done using application/x-www-form-urlencoded format,
+with the key beying "data" and the value being a comma separated list of items.
+
+e.g. using wget:
+
+wget http://host/pamela/upload.php -O - --post-data data=comma,separated,list,of,items

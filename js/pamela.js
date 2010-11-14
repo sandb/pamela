@@ -1,5 +1,5 @@
 /*
-    Copyright 2009 Pieter Iserbyt
+    Copyright 2010 Pieter Iserbyt
 
     This file is part of Pamela.
 
@@ -193,7 +193,7 @@ Pamela.prototype.resize = function() {
 
 Pamela.prototype.updateEntries = function() {
   var self = this;
-  $.getJSON("macs.php", function(data) { 
+  $.getJSON("data.php", function(data) { 
     self.updateNodes(data); 
   });
   self.entriesTimer = setTimeout(function() { self.updateEntries(); }, 20000);

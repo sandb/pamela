@@ -45,11 +45,10 @@ function usage {
   -p		Http-auth password. Defaults to [$PASSWORD].
   -h            Shows help
   
-Pamela is an arp-scanner, it uploads the mac addresses in your local lan on a
-webserver where you get a visual representation of the mac addresses present.
-Multiple people on multiple lans can run pamela together against the same
-server, where all results are agregated. In short, pamela gives you an overview
-of how big the shared network is." 
+This pamela scanner is an arp-scanner that uploads mac addresses in your local 
+lan on a webserver where you get a visual representation of those mac addresses 
+present. Multiple people on multiple lans can run this or any other scanner 
+together against the same web server, where all results will be agregated."
 }
 
 function check_if_root {
@@ -109,22 +108,22 @@ function parse_params {
 
 function scan_and_upload {
 	echo $(date)" scanning..."
-	NETMASK="$(ip -4 addr show "$IF" | egrep -o "brd [0-9\.]+" | egrep -o "[0-9\.]+")"
-	MACS=""
-	NUM_MACS=0
+	DATA=""
+	NUM_DATA=0
 	for M in $(arp-scan -R -i 10 --interface "$IF" --localnet | awk '{ print $2 }' | grep :.*: | sort | uniq)
 	do 
-		[ -n "$MACS" ] && MACS="$MACS,$M" || MACS="$M";
-		let "NUM_MACS=NUM_MACS+1"
+		[ -n "$DATA" ] && DATA="$DATA,$M" || DATA="$M";
+		let "NUM_DATA=NUM_DATA+1"
 	done
-	POST="sn=$NETMASK&macs=$MACS"
-	RESULT=$(wget "$OUT" -O - --quiet --post-data "$POST" --user "$USER" --password "$PASSWORD" || echo "wget error: $?")
+	POST="data=$DATA"
+	echo wget "$OUT" -O - --quiet --post-data "$POST" --user "$USER" --password "$PASSWORD" || echo "wget error: $?"
+	RESULT=$(wget "$OUT" -O - --post-data "$POST" --user "$USER" --password "$PASSWORD")
 	if [ -n "$RESULT" ]
 	then
 		echo Error uploading results:
 		echo "$RESULT"
 	fi
-	echo $(date)" Uploaded $NUM_MACS mac addresses..."
+	echo $(date)" Uploaded $NUM_DATA mac addresses..."
 }
 
 parse_params $@

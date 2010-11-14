@@ -98,7 +98,6 @@ function DownloadScriptButton(x, y) {
 
 DownloadScriptButton.prototype.draw = function() {
 	if (this.isHover) {
-		//context.fillStyle = 'rgb(192,192,192)';
 		context.fillStyle = config.buttonColor;
 		context.font = "18pt sans-serif";
 		context.fillText("Download pamela scanner script", this.x, this.y - 10);

@@ -1,6 +1,6 @@
 <?php  
 /*
-    Copyright 2009 Pieter Iserbyt
+    Copyright 2010 Pieter Iserbyt
 
     This file is part of Pamela.
 
@@ -24,24 +24,24 @@ header("Cache-Control: no-cache");
 header("Pragma: no-cache");   
 
 require_once("config.php");
-require_once("lib/macs.php");
+require_once("lib/data.php");
 
-// for debug purposes, increases the numbers of macs artificially
+// for debug purposes, increases the numbers of data artificially
 function multiply() {
- global $macs;
- $c = count($macs);
+ global $data;
+ $c = count($data);
  for ($j = 0; $j < $c; $j++) {
   for ($i = 0; $i <10; $i++) {
-    $macs[] = $macs[$j].$i;
+    $data[] = $data[$j].$i;
    }
  }
 }
 
-$macs = macs_get();
-if (count($macs) > 0) {
+$data = data_get();
+if (count($data) > 0) {
 //multiply();
- echo('["'.implode('", "', $macs).'"]');
+ echo('["'.implode('", "', $data).'"]');
 } else {
  echo('[]');
 } 
-macs_purge();
+data_purge();

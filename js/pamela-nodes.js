@@ -1,5 +1,5 @@
 /*
-    Copyright 2009 Pieter Iserbyt
+    Copyright 2010 Pieter Iserbyt
 
     This file is part of Pamela.
 
@@ -33,12 +33,10 @@ function ColorGenerator() {
 }
 
 ColorGenerator.prototype.generate = function() {
-  if (this.colorGeneratorValue > this.colors.length)
+  this.colorGeneratorValue += 1;
+  if (this.colorGeneratorValue >= this.colors.length)
     this.colorGeneratorValue = 0;
-
-  // weirdo fix for chrome bug where the colors get
-  // garbage collected. I think.
-  var c = this.colors[this.colorGeneratorValue++];
+  var c = this.colors[this.colorGeneratorValue];
   return [c[0], c[1], c[2]];
 };
 
@@ -52,10 +50,6 @@ function Node(name) {
   this.setMode("newNode");
   
   var size = Math.min(width, height);
-  //this.color = [
-  //  Math.random() * 128, 
-  //  Math.random() * 128, 
-  //  Math.random() * 128]; 
   this.color = colorGenerator.generate();
   this.position = new Vector(
     (Math.random() * size) - (size / 2), 
@@ -97,19 +91,12 @@ Node.prototype.normal = {
     var scale = width * 3 / -this.projection.z;
     var alphaScale = 0.5 + this.alpha / 128;
     var invAlphaScale = 1 - alphaScale;
-    var col = 
-    /* [
-      Math.round(this.color[0]),
-      Math.round(this.color[1]),
-      Math.round(this.color[2]),
-    ]; */
-    [
+    var col = [
       Math.round(128 * invAlphaScale + this.color[0] * alphaScale),
       Math.round(128 * invAlphaScale + this.color[1] * alphaScale),
       Math.round(128 * invAlphaScale + this.color[2] * alphaScale),
     ]; 
     context.fillStyle = 'rgb(' + col[0] + ',' + col[1] + ',' + col[2] + ')';
-    //context.globalAlpha = this.alpha / 255; 
     context.beginPath();
     context.arc(this.projection.x, this.projection.y, scale, 0, Math.PI * 2, false);
     context.fill();

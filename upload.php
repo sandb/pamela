@@ -1,6 +1,6 @@
 <?php
 /*
-    Copyright 2009 Pieter Iserbyt
+    Copyright 2010 Pieter Iserbyt
 
     This file is part of Pamela.
 
@@ -20,42 +20,35 @@
 
 header("Content-type: text/plain");  
 require_once("lib/util.php");
-require_once("lib/macs.php");
+require_once("lib/data.php");
 
 class Upload {
 
-	private $macs;
+	private $data;
 
 	function __construct() {
-		$this->macs = getPost("macs");
+		$this->data = getPost("data");
 	}
 
-	private function parseAndValidate() {
-		if ($this->macs == NULL) {
-			echoln("Missing macs param");
+	private function validate() {
+		if ($this->data == NULL) {
+			echoln("Missing data param");
 			return false;
 		}
 		
-		$mcs = explode(',', $this->macs);
-		foreach($mcs as $mac) {
-			if (preg_match("/^(([\dABCDEF]){2}:){5}([\dABCDEF]){2}$/i", $mac) == 1)
-				continue;
-			echoln("mac $mac is not in the right format");
-			return false;
-		}
 		return true;
 	}
 
-	private function writeMacs() {
-		$mcs = explode(',', $this->macs);
-		foreach($mcs as $mac) {
-			macs_add($mac);
+	private function writeData() {
+		$datas = explode(',', $this->data);
+		foreach($datas as $data) {
+			data_add($data);
 		}
 	}
 	
 	public function run() {
-		$this->parseAndValidate();
-		$this->writeMacs();
+		if ($this->validate())
+		  $this->writeData();
 	}
 
 }
