@@ -24,7 +24,6 @@ header("Cache-Control: no-cache");
 header("Pragma: no-cache");   
 
 require_once("config.php");
-require_once("lib/trans.php");
 require_once("lib/macs.php");
 
 // for debug purposes, increases the numbers of macs artificially
@@ -37,12 +36,12 @@ function multiply() {
    }
  }
 }
+
 $macs = macs_get();
-$macs = known_macs_translate($macs); 
 if (count($macs) > 0) {
- //multiply();
- echo '["'.implode('", "', $macs).'"]';
+//multiply();
+ echo('["'.implode('", "', $macs).'"]');
 } else {
- echo '[]';
+ echo('[]');
 } 
 macs_purge();
