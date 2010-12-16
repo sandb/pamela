@@ -24,7 +24,6 @@ LICENSE
 PAM_DIR="$(cd $(dirname $0) && pwd)"
 PAM_CRON="/etc/cron.d/pamela"
 PAM_SCRIPT="$PAM_DIR/$(basename $0)"
-PAM_LOG="$PAM_DIR/pamela.log"
 
 REGISTER=
 
@@ -70,13 +69,15 @@ function register {
 	check_if_root
 	check_if_arpscan_installed
 	echo "Registering pamela in cron: $PAM_CRON"
-	echo "*/2 *     * * *     root   [ -x \"$PAM_SCRIPT\" ] && \"$PAM_SCRIPT\" -i \"$IF\" -o \"$OUT\" -u \"$USER\" -p \"$PASSWORD\" >> \"$PAM_LOG\"" > "$PAM_CRON"
+	echo "*/2 *     * * *     [ -x \"$PAM_SCRIPT\" ] && \"$PAM_SCRIPT\" -i \"$IF\" -o \"$OUT\" -u \"$USER\" -p \"$PASSWORD\" | logger -t pamela" > "$PAM_CRON"
+	echo "Depending on your version of crond, you might have to restart the cron daemon for the changes to take effect"
 }
 
 function unregister {
 	check_if_root
 	echo "Unregistering pamela in cron: $PAM_CRON"
 	rm "$PAM_CRON"
+	echo "Depending on your version of crond, you might have to restart the cron daemon for the changes to take effect"
 }
 
 function parse_params {
@@ -116,8 +117,7 @@ function scan_and_upload {
 		let "NUM_DATA=NUM_DATA+1"
 	done
 	POST="data=$DATA"
-	echo wget "$OUT" -O - --quiet --post-data "$POST" --user "$USER" --password "$PASSWORD" || echo "wget error: $?"
-	RESULT=$(wget "$OUT" -O - --post-data "$POST" --user "$USER" --password "$PASSWORD")
+	RESULT=$(wget "$OUT" -O - --quiet --post-data "$POST" --user "$USER" --password "$PASSWORD")
 	if [ -n "$RESULT" ]
 	then
 		echo Error uploading results:
