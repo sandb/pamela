@@ -23,25 +23,29 @@ LICENSE
 
 PAM_DIR="$(cd $(dirname $0) && pwd)"
 PAM_CRON="/etc/cron.d/pamela"
-PAM_SCRIPT="$PAM_DIR/$(basename $0)"
-
-REGISTER=
-
+PAM_SCRIPT="${PAM_DIR}/$(basename $0)"
+REGISTER=''
+SIMULATE=''
 IF='eth0'
 OUT='http://yourserver.com/pamela/upload.php'
 USER=''
 PASSWORD=''
+TRANSLATE=''
+POST=''
 
 function usage {
-	echo "Usage: pamela-scanner [OPTIONS] 
+  echo "Usage: pamela-scanner [OPTIONS] 
 
-  -i INTERFACE  Interface to arp-scan. Defaults to [$IF]. 
-  -o URL        The url of the pamela upload script (including /upload.php). 
-		Defaults to [$OUT].
-  -r		Register the script in cron every 2 minutes
-  -q		Unregister the script from cron
-  -u		Http-auth user. Defaults to [$USER].
-  -p		Http-auth password. Defaults to [$PASSWORD].
+  -i INTERFACE  Interface to arp-scan. Defaults to [${IF}]. 
+  -o URL        The url of the pamela upload script (including /upload.php).
+                Defaults to [${OUT}].
+  -r            Register the script in cron every 2 minutes
+  -q            Unregister the script from cron
+  -u            Http-auth user. Defaults to [${USER}].
+  -p            Http-auth password. Defaults to [${PASSWORD}].
+  -s            Simulate, don't commit the post.
+  -t URL        Translate mac addresses using the data provided from the 
+                specified URL. CSV format expected (mac,name\\n).
   -h            Shows help
   
 This pamela scanner is an arp-scanner that uploads mac addresses in your local 
@@ -51,83 +55,138 @@ together against the same web server, where all results will be agregated."
 }
 
 function check_if_root {
-	if [ "$(id -ru)" != "0" ]
-	then
-		echo "Must be root to run pamela-scanner" 
-		exit 1
-	fi
+  if [ "$(id -ru)" != "0" ]
+  then
+    echo "Must be root to run pamela-scanner" 
+    exit 1
+  fi
 }
 
 function check_if_arpscan_installed {
-	if [ -z "$(which arp-scan)" ]
-	then
-		echo "ENOARPSCAN: Could not find arp-scan, please install it"
-	fi
+  if [ -z "$(which arp-scan)" ]
+  then
+    echo "ENOARPSCAN: Could not find arp-scan, please install it"
+  fi
 }
 
 function register {
-	check_if_root
-	check_if_arpscan_installed
-	echo "Registering pamela in cron: $PAM_CRON"
-	echo "*/2 *     * * *     [ -x \"$PAM_SCRIPT\" ] && \"$PAM_SCRIPT\" -i \"$IF\" -o \"$OUT\" -u \"$USER\" -p \"$PASSWORD\" | logger -t pamela" > "$PAM_CRON"
-	echo "Depending on your version of crond, you might have to restart the cron daemon for the changes to take effect"
+  check_if_root
+  check_if_arpscan_installed
+  echo "Registering pamela in cron: ${PAM_CRON}"
+  echo "*/2 *     * * *     [ -x \"${PAM_SCRIPT}\" ] && \"${PAM_SCRIPT}\" -i \"${IF}\" -o \"${OUT}\" -u \"${USER}\" -p \"${PASSWORD}\" | logger -t pamela" > "${PAM_CRON}"
+  echo "Depending on your version of crond, you might have to restart the cron daemon for the changes to take effect"
 }
 
 function unregister {
-	check_if_root
-	echo "Unregistering pamela in cron: $PAM_CRON"
-	rm "$PAM_CRON"
-	echo "Depending on your version of crond, you might have to restart the cron daemon for the changes to take effect"
+  check_if_root
+  echo "Unregistering pamela in cron: ${PAM_CRON}"
+  rm "${PAM_CRON}"
+  echo "Depending on your version of crond, you might have to restart the cron daemon for the changes to take effect"
 }
 
 function parse_params {
-	TEMP=$(getopt -o 'hrqi:o:s:u:p:-n' "pamela arp scanner" -- "$@")
-	if [ $? != 0 ] ; then echo "Could not parse parameters..." >&2 ; exit 1 ; fi
-	eval set "$TEMP"
-	while true
-	do
-		shift;
-		[ -z "$1" ] && break;
-		case "$1" in
-			-i) IF="$2"; shift;;
-			-o) OUT="$2"; shift;;
-			-s) SLEEP="$2"; shift;;
-			-u) USER="$2"; shift;; 
-			-p) PASSWORD="$2"; shift;;
-			-r) REGISTER='r';;
-			-q) unregister; exit 0;;
-			-h|'-?') usage; exit 1;;
-			*) echo "Unknown param: [$1]"; usage; exit 1;;
-		esac
-	done
-	# Register only after parsing all args 
-	if [ -n "$REGISTER" ]; then 
-		register
-		exit 0
-	fi
+  TEMP=$(getopt -o 'hrqsi:o:u:p:t:-n' "pamela arp scanner" -- "$@")
+  if [ $? != 0 ]  
+  then 
+    echo "Could not parse parameters..." >&2 
+    exit 1 
+  fi
+
+  eval set "${TEMP}"
+  while true
+  do
+    shift;
+    [ -z "$1" ] && break;
+    case "$1" in
+      -i) IF="$2"; shift;;
+      -o) OUT="$2"; shift;;
+      -u) USER="$2"; shift;; 
+      -p) PASSWORD="$2"; shift;;
+      -r) REGISTER='r';;
+      -s) SIMULATE='s';;
+      -q) unregister; exit 0;;
+      -t) TRANSLATE="$2"; shift;;
+      -h|'-?') usage; exit 1;;
+      *) echo "Unknown param: [$1]"; usage; exit 1;;
+    esac
+  done
+  # Register only after parsing all args 
+  if [ -n "${REGISTER}" ]
+  then 
+    register
+    exit 0
+  fi
 }
 
-function scan_and_upload {
-	echo $(date)" scanning..."
-	DATA=""
-	NUM_DATA=0
-	for M in $(arp-scan -R -i 10 --interface "$IF" --localnet | awk '{ print $2 }' | grep :.*: | sort | uniq)
-	do 
-		[ -n "$DATA" ] && DATA="$DATA,$M" || DATA="$M";
-		let "NUM_DATA=NUM_DATA+1"
-	done
-	POST="data=$DATA"
-	RESULT=$(wget "$OUT" -O - --quiet --post-data "$POST" --user "$USER" --password "$PASSWORD")
-	if [ -n "$RESULT" ]
-	then
-		echo Error uploading results:
-		echo "$RESULT"
-	fi
-	echo $(date)" Uploaded $NUM_DATA mac addresses..."
+function scan {
+  echo $(date)" scanning..."
+  DATA=""
+  NUM_DATA=0
+  for M in $(arp-scan -R -i 10 --interface "${IF}" --localnet | awk '{ print $2 }' | grep :.*: | sort | uniq)
+  do 
+    [ -n "${DATA}" ] && DATA="${DATA},${M}" || DATA="${M}";
+    let "NUM_DATA=NUM_DATA+1"
+  done
+  POST="${DATA}"
+}
+
+function translate {
+  if [ -z "${TRANSLATE}" ]
+  then
+    return 0
+  fi
+ 
+  # translate denotes a url
+  # save the output of the url to a file and use it as a file
+  TRANSLATE_URL=${TRANSLATE}
+  TRANSLATE=$(mktemp)
+
+  wget --quiet -O "${TRANSLATE}" "${TRANSLATE_URL}"
+
+  POST=$(echo ${POST} | awk -v names="${TRANSLATE}" 'BEGIN { 
+    RS="\n"
+    FS=","
+    while ((getline nl < names) > 0) { 
+      split(nl, n); 
+      nms[n[2]] = n[1]
+    }
+    close(names)
+    RS=","
+    first=1
+    while ((getline i)> 0) {
+      sub(/\n$/,"",i)
+      #print "input:", i, "translates to", (i in nms?nms[i]:i)
+      if (!first) 
+        printf(",")
+      printf (i in nms?nms[i]:i)
+      first=0
+    }
+  }')
+
+  rm ${TRANSLATE}
+}
+
+function upload {
+  if [ -z "${SIMULATE}" ]
+  then
+    RESULT=$(wget "${OUT}" -O - --quiet --post-data "data=${POST}" --user "${USER}" --password "${PASSWORD}")
+  else
+    echo Not executing: [wget "${OUT}" -O - --quiet --post-data "data=${POST}" --user "${USER}" --password "${PASSWORD}"]
+    RESULT=
+  fi
+
+  if [ -n "${RESULT}" ]
+  then
+    echo Error uploading results:
+    echo "${RESULT}"
+  fi
+  echo $(date)" Uploaded ${NUM_DATA} mac addresses..."
 }
 
 parse_params $@
 check_if_root
 check_if_arpscan_installed 
-scan_and_upload
+scan
+translate
+upload
 
