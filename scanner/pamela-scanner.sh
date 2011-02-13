@@ -73,7 +73,7 @@ function register {
   check_if_root
   check_if_arpscan_installed
   echo "Registering pamela in cron: ${PAM_CRON}"
-  echo "*/2 *     * * *     [ -x \"${PAM_SCRIPT}\" ] && \"${PAM_SCRIPT}\" -i \"${IF}\" -o \"${OUT}\" -u \"${USER}\" -p \"${PASSWORD}\" | logger -t pamela" > "${PAM_CRON}"
+  echo "*/2 *     * * *     [ -x \"${PAM_SCRIPT}\" ] && \"${PAM_SCRIPT}\" -i \"${IF}\" -o \"${OUT}\" -u \"${USER}\" -p \"${PASSWORD}\" -t \"${TRANSLATE}\" | logger -t pamela" > "${PAM_CRON}"
   echo "Depending on your version of crond, you might have to restart the cron daemon for the changes to take effect"
 }
 
@@ -141,7 +141,7 @@ function translate {
   TRANSLATE_URL=${TRANSLATE}
   TRANSLATE=$(mktemp)
 
-  wget --quiet -O "${TRANSLATE}" "${TRANSLATE_URL}"
+  wget --no-check-certificate --quiet -O "${TRANSLATE}" "${TRANSLATE_URL}"
 
   POST=$(echo ${POST} | awk -v names="${TRANSLATE}" 'BEGIN { 
     RS="\n"
@@ -169,9 +169,9 @@ function translate {
 function upload {
   if [ -z "${SIMULATE}" ]
   then
-    RESULT=$(wget "${OUT}" -O - --quiet --post-data "data=${POST}" --user "${USER}" --password "${PASSWORD}")
+    RESULT=$(wget "${OUT}" --no-check-certificate -O - --quiet --post-data "data=${POST}" --user "${USER}" --password "${PASSWORD}")
   else
-    echo Not executing: [wget "${OUT}" -O - --quiet --post-data "data=${POST}" --user "${USER}" --password "${PASSWORD}"]
+    echo Not executing: [wget "${OUT}" --no-check-certificate -O - --quiet --post-data "data=${POST}" --user "${USER}" --password "${PASSWORD}"]
     RESULT=
   fi
 
