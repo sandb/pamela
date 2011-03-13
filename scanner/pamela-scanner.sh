@@ -32,6 +32,7 @@ USER=''
 PASSWORD=''
 TRANSLATE=''
 POST=''
+TIMEOUT=200
 
 function usage {
   echo "Usage: pamela-scanner [OPTIONS] 
@@ -141,14 +142,14 @@ function translate {
   TRANSLATE_URL=${TRANSLATE}
   TRANSLATE=$(mktemp)
 
-  wget --no-check-certificate --quiet -O "${TRANSLATE}" "${TRANSLATE_URL}"
+  wget --timeout="${TIMEOUT}" --no-check-certificate --quiet -O "${TRANSLATE}" "${TRANSLATE_URL}"
 
   POST=$(echo ${POST} | awk -v names="${TRANSLATE}" 'BEGIN { 
     RS="\n"
     FS=","
     while ((getline nl < names) > 0) { 
       split(nl, n); 
-      nms[n[2]] = n[1]
+      nms[n[1]] = n[2]
     }
     close(names)
     RS=","
@@ -169,9 +170,9 @@ function translate {
 function upload {
   if [ -z "${SIMULATE}" ]
   then
-    RESULT=$(wget "${OUT}" --no-check-certificate -O - --quiet --post-data "data=${POST}" --user "${USER}" --password "${PASSWORD}")
+    RESULT=$(wget "${OUT}" --timeout="${TIMEOUT}" --no-check-certificate -O - --quiet --post-data "data=${POST}" --user "${USER}" --password "${PASSWORD}")
   else
-    echo Not executing: [wget "${OUT}" --no-check-certificate -O - --quiet --post-data "data=${POST}" --user "${USER}" --password "${PASSWORD}"]
+    echo Not executing: [wget "${OUT}" --timeout="${TIMEOUT}" --no-check-certificate -O - --quiet --post-data "data=${POST}" --user "${USER}" --password "${PASSWORD}"]
     RESULT=
   fi
 
