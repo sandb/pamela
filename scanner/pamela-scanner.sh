@@ -74,7 +74,7 @@ function register {
   check_if_root
   check_if_arpscan_installed
   echo "Registering pamela in cron: ${PAM_CRON}"
-  echo "*/2 *     * * *     [ -x \"${PAM_SCRIPT}\" ] && \"${PAM_SCRIPT}\" -i \"${IF}\" -o \"${OUT}\" -u \"${USER}\" -p \"${PASSWORD}\" -t \"${TRANSLATE}\" | logger -t pamela" > "${PAM_CRON}"
+  echo "*/2 *     * * *  root   [ -x \"${PAM_SCRIPT}\" ] && \"${PAM_SCRIPT}\" -i \"${IF}\" -o \"${OUT}\" -u \"${USER}\" -p \"${PASSWORD}\" -t \"${TRANSLATE}\" | logger -t pamela" > "${PAM_CRON}"
   echo "Depending on your version of crond, you might have to restart the cron daemon for the changes to take effect"
 }
 
