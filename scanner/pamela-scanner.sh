@@ -67,6 +67,7 @@ function check_if_arpscan_installed {
   if [ -z "$(which arp-scan)" ]
   then
     echo "ENOARPSCAN: Could not find arp-scan, please install it"
+    exit 1
   fi
 }
 
