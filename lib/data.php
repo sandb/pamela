@@ -17,7 +17,15 @@
     You should have received a copy of the GNU General Public License
     along with Pamela.  If not, see <http://www.gnu.org/licenses/>.
 */
-require_once("lib/db.php");
+require_once("config.php");
+
+function get_db() {
+	static $db = NULL;
+	if ($db == NULL) {
+		$db = new SQLite3(SQLITE_DB);
+	}
+	return $db;
+}
 
 function data_check_table() {
   static $table_exists = FALSE;

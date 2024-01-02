@@ -18,8 +18,14 @@
     along with Pamela.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/* Checks if a $_POST param is set and returns it or NULL if it's not set */
+function getPost($name, $default = NULL) {
+	if (!isset($_POST[$name])) return $default;
+	return $_POST[$name];
+}
+
+
 header("Content-type: text/plain");  
-require_once("lib/util.php");
 require_once("lib/data.php");
 
 class Upload {
@@ -32,7 +38,7 @@ class Upload {
 
 	private function validate() {
 		if ($this->data == NULL) {
-			echoln("Missing data param");
+			printf("Missing data param\n");
 			return false;
 		}
 		
