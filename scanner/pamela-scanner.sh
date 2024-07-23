@@ -147,22 +147,26 @@ function translate {
   POST=$(echo ${POST} | awk -v names="${TRANSLATE}" 'BEGIN { 
     RS="\n"
     FS=","
+    count = 1
     while ((getline nl < names) > 0) { 
       split(nl, n); 
-      nms[n[1]] = n[2]
+      nms[n[1]] = (count == 1 ? "gateway" : "hacker" count)
+      count++
     }
     close(names)
     RS=","
     first=1
+    count = 1
     while ((getline i)> 0) {
       sub(/\n$/,"",i)
-      #print "input:", i, "translates to", (i in nms?nms[i]:i)
       if (!first) 
         printf(",")
-      printf (i in nms?nms[i]:i)
+      printf (i in nms ? nms[i] : (count == 1 ? "gateway" : "hacker" count))
       first=0
+      count++
     }
   }')
+
 
   rm ${TRANSLATE}
 }
