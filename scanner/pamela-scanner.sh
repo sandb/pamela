@@ -150,7 +150,7 @@ function translate {
     FS=","
     while ((getline nl < names) > 0) { 
       split(nl, n); 
-      nms[n[1]] = n[2]
+      nms[tolower(n[1])] = n[2]
     }
     close(names)
     RS=","
@@ -160,7 +160,7 @@ function translate {
       #print "input:", i, "translates to", (i in nms?nms[i]:i)
       if (!first) 
         printf(",")
-      printf (i in nms?nms[i]:i)
+      printf (tolower(i) in nms?nms[tolower(i)]:i)
       first=0
     }
   }')
